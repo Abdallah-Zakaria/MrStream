@@ -16,13 +16,24 @@ io.on('connection', socket => {
   }
   socket.emit("yourID", socket.id);
   io.sockets.emit("allUsers", users);
-  
+
   socket.on('disconnect', () => {
     delete users[socket.id];
     io.sockets.emit("allUsers", users);
   })
 
+  socket.on('leave', (data) => {
+    delete users[socket.id];
+    io.sockets.emit("allUsers", users);
+    console.log(data)
+    io.to(data.userToCall).emit('endCall', {});
+    io.to(data.from).emit('endCall', {});
+
+  })
+
   socket.on("callUser", (data) => {
+    console.log(data)
+
     io.to(data.userToCall).emit('calling', { signal: data.signalData, from: data.from });
   })
 
