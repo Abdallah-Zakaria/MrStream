@@ -22,12 +22,17 @@ io.on('connection', socket => {
     io.sockets.emit("allUsers", users);
   })
 
-  socket.on('leave', (data) => {
-    delete users[socket.id];
-    io.sockets.emit("allUsers", users);
+  socket.on('leaveRoom', (data) => {
     io.to(data.userToCall).emit('endCall', {});
     io.to(data.from).emit('endCall', {});
   })
+
+  socket.on('leaveMeeting', () => {
+    delete users[socket.id];
+    io.sockets.emit("allUsers", users);
+  })
+
+
 
   socket.on("callUser", (data) => {
 
