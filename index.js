@@ -10,8 +10,11 @@ const socketio = require('socket.io');
 //   }
 // });
 
+
+const PORT = process.env.PORT || 8000;
+
 const cors = require('cors');
-app.use(cors());
+server.use(cors());
 
 const io = socketio(server);
 
@@ -52,4 +55,4 @@ io.on('connection', socket => {
   })
 });
 
-server.listen(8000, () => console.log('server is running on port 8000'));
+server.listen(PORT, () => console.log('server is running on port 8000'));
