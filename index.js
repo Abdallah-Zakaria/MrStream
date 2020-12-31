@@ -20,17 +20,30 @@ const PORT = process.env.PORT || 8000;
 
 
 const users = {};
+const userDetails ={};
 
 io.on('connection', socket => {
   if (!users[socket.id]) {
     users[socket.id] = socket.id;
   }
+
+  socket.on('addMyId', (data)=>{
+    if (!userDetails[socket.id]) {
+      userDetails[socket.id] = data.myId;
+    }
+    io.sockets.emit('allUserDetails' ,userDetails );
+
+  })
+
   socket.emit("yourID", socket.id);
   io.sockets.emit("allUsers", users);
 
   socket.on('disconnect', () => {
     delete users[socket.id];
+    delete userDetails[socket.id];
     io.sockets.emit("allUsers", users);
+    io.sockets.emit('allUserDetails' ,userDetails );
+
   })
 
   socket.on('leaveRoom', (data) => {
@@ -40,7 +53,10 @@ io.on('connection', socket => {
 
   socket.on('leaveMeeting', () => {
     delete users[socket.id];
+    delete userDetails[socket.id];
     io.sockets.emit("allUsers", users);
+    io.sockets.emit('allUserDetails' ,userDetails );
+
   })
 
 
