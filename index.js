@@ -2,11 +2,19 @@ const express = require("express");
 const http = require("http");
 const app = express();
 const server = http.createServer(app);
-const io = require('socket.io')(server, {
-  cors: {
-    origin: '*',
-  }
-});
+const socketio = require('socket.io');
+
+// const io = require('socket.io')(server, {
+//   cors: {
+//     origin: '*',
+//   }
+// });
+
+const cors = require('cors');
+app.use(cors());
+
+const io = socketio(server);
+
 
 const users = {};
 
@@ -22,12 +30,17 @@ io.on('connection', socket => {
     io.sockets.emit("allUsers", users);
   })
 
-  socket.on('leave', (data) => {
-    delete users[socket.id];
-    io.sockets.emit("allUsers", users);
+  socket.on('leaveRoom', (data) => {
     io.to(data.userToCall).emit('endCall', {});
     io.to(data.from).emit('endCall', {});
   })
+
+  socket.on('leaveMeeting', () => {
+    delete users[socket.id];
+    io.sockets.emit("allUsers", users);
+  })
+
+
 
   socket.on("callUser", (data) => {
 
